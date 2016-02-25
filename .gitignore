@@ -1,0 +1,4 @@
+*~
+*.pyc
+xltranslate.egg-info/
+venv/
