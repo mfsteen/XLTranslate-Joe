@@ -9,15 +9,23 @@ from . import wsp
 
 log = logging.getLogger(__name__)
 
+WSP_REGISTRY = {
+    'Income Statement': wsp.IncomeStatement,
+    'Key Stats': wsp.KeyStats,
+}
 
 def extract(input_file):
     wb = openpyxl.load_workbook(input_file, read_only=True)
     for sheet in wb:
-        if sheet.title == "Income Statement":
-            wspobj = wsp.IncomeStatement(sheet)
+        klass = WSP_REGISTRY.get(sheet.title, None)
+        if klass is not None:
+            wspobj = klass(sheet)
+            print("\n")
+            print("="*79)
+            print("%s\n" % (sheet.title, ))
             wspobj.dump()
-            continue
-        log.warn("Ignoring unknown sheet = %s" % (sheet.title, ))
+        else:
+            log.warn("Ignoring unknown sheet = %s" % (sheet.title, ))
 
 def main():
     logging.basicConfig(level=logging.DEBUG)
