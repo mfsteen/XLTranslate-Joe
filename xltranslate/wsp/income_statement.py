@@ -26,7 +26,7 @@ class IncomeStatement(object):
         for col in range(2, (self._sheet.max_column + 1)):
             data = self._sheet.cell(column=col, row=self._starting_row).value
             if data is None:
-                return col
+                return (col - 1)
         raise RuntimeError("No convergence on number-of-data-columns")
 
     def _extract_col_variables(self):
