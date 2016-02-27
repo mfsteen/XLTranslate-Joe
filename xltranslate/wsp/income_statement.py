@@ -74,5 +74,16 @@ class IncomeStatement(object):
         for ds_line in self.data_set:
             ds_line = [str(d) for d in ds_line]
             data_set.append(ds_line)
+        # construct a format-line for pretty printing
+        fmt_list = []
+        for col in range(0, len(var)):
+            col_size = 0
+            for row in range(0, len(data_set)):
+                data_sz = len(data_set[row][col])
+                if  data_sz > col_size:
+                    col_size = data_sz
+            fmt_list.append("{:<%d}" % (col_size, ))
+        fmt_line = ' '.join(fmt_list)
+        # dump on screen
         for ds_line in data_set:
-            print('\t'.join(ds_line))
+            print(fmt_line.format(*ds_line))
