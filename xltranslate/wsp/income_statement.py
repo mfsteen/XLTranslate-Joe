@@ -80,7 +80,7 @@ class IncomeStatement(object):
             col_size = 0
             for row in range(0, len(data_set)):
                 data_sz = len(data_set[row][col])
-                if  data_sz > col_size:
+                if data_sz > col_size:
                     col_size = data_sz
             fmt_list.append("{:<%d}" % (col_size, ))
         fmt_line = ' '.join(fmt_list)

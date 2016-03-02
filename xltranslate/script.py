@@ -14,6 +14,7 @@ WSP_REGISTRY = {
     'Key Stats': wsp.KeyStats,
 }
 
+
 def extract(input_file):
     wb = openpyxl.load_workbook(input_file, read_only=True)
     for sheet in wb:
@@ -26,6 +27,7 @@ def extract(input_file):
             wspobj.dump()
         else:
             log.warn("Ignoring unknown sheet = %s" % (sheet.title, ))
+
 
 def main():
     logging.basicConfig(level=logging.DEBUG)
