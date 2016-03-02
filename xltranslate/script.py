@@ -17,6 +17,7 @@ WSP_REGISTRY = {
     "Historical Capitalization": wsp.HistoricalCapitalization,
     "Ratios": wsp.Ratios,
     "Supplemental": wsp.Supplemental,
+    "Industry Specific": wsp.IndustrySpecific,
 }
 
 

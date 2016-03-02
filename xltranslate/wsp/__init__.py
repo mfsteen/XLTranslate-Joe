@@ -7,3 +7,4 @@ from cash_flow import CashFlow  # noqa
 from historical_capitalization import HistoricalCapitalization  # noqa
 from ratios import Ratios  # noqa
 from supplemental import Supplemental  # noqa
+from industry_specific import IndustrySpecific  # noqa
