@@ -110,6 +110,8 @@ class TypeATable(object):
             data = cell.value
             if cell.data_type == openpyxl.cell.Cell.TYPE_STRING:
                 data = sanitise_string(data)
+            if cell.is_date:
+                data = data.strftime("%b-%d-%Y")
             if data in ('-', ):
                 data = 0
             data_set.append(data)
