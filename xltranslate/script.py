@@ -18,6 +18,7 @@ WSP_REGISTRY = {
     "Ratios": wsp.Ratios,
     "Supplemental": wsp.Supplemental,
     "Industry Specific": wsp.IndustrySpecific,
+    "Pension OPEB": wsp.PensionOPEB,
 }
 
 
