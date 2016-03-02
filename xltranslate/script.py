@@ -19,6 +19,7 @@ WSP_REGISTRY = {
     "Supplemental": wsp.Supplemental,
     "Industry Specific": wsp.IndustrySpecific,
     "Pension OPEB": wsp.PensionOPEB,
+    "Segments": wsp.Segments,
 }
 
 

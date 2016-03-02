@@ -9,3 +9,4 @@ from ratios import Ratios  # noqa
 from supplemental import Supplemental  # noqa
 from industry_specific import IndustrySpecific  # noqa
 from pension_opeb import PensionOPEB  # noqa
+from segments import Segments  # noqa
