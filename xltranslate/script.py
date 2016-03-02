@@ -12,6 +12,7 @@ log = logging.getLogger(__name__)
 WSP_REGISTRY = {
     'Income Statement': wsp.IncomeStatement,
     'Key Stats': wsp.KeyStats,
+    'Balance Sheet': wsp.BalanceSheet,
 }
 
 
