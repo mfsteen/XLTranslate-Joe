@@ -16,6 +16,7 @@ WSP_REGISTRY = {
     'Cash Flow': wsp.CashFlow,
     "Historical Capitalization": wsp.HistoricalCapitalization,
     "Ratios": wsp.Ratios,
+    "Supplemental": wsp.Supplemental,
 }
 
 
