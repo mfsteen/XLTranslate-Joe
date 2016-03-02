@@ -45,18 +45,26 @@ def _split_table_start_end_pairs(table_name_list):
 
 
 def _get_table_data_cells(cells, curr_table_name, next_table_name):
+    start_found = False
     start = 0
+    end_found = False
     end = 0
     if next_table_name is None:
+        end_found = True
         end = len(cells) - 1
     for row, index in zip(cells, range(0, len(cells))):
         c1_value = sanitise_string(row[0].value)
-        if c1_value == curr_table_name:
+        if not start_found and c1_value == curr_table_name:
+            start_found = True
             start = index + 1
-        if next_table_name and c1_value == next_table_name:
+        if not end_found and c1_value == next_table_name:
+            end_found = True
             end = index
-        if start and end:
+        if start_found and end_found:
             break
+    if not start_found or not end_found:
+        raise RuntimeError("Could not narrow-down table %s" %
+                           (curr_table_name, ))
     table = cells[start:end]
     empty = 0
     for cell in reversed(table[0]):
