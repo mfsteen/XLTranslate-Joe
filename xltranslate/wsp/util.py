@@ -72,7 +72,6 @@ def _get_table_data_cells(cells, curr_table_name, next_table_name):
             empty += 1
         else:
             break
-    log.debug("found %d empty cells in table %s", empty, curr_table_name)
     ntable = []
     for row in table:
         ntable.append(row[0:(len(row) - empty)])
