@@ -14,6 +14,7 @@ WSP_REGISTRY = {
     'Key Stats': wsp.KeyStats,
     'Balance Sheet': wsp.BalanceSheet,
     'Cash Flow': wsp.CashFlow,
+    "Historical Capitalization": wsp.HistoricalCapitalization,
 }
 
 
