@@ -6,9 +6,18 @@ from . import util
 log = logging.getLogger(__name__)
 
 TABLES = (
-    "Key Financials",
-    "Current Capitalization (Millions of USD)",
-    "Valuation Multiples based on Current Capitalization",
+    {
+        "name": "Key Financials",
+        "first-data-row": 1,
+    },
+    {
+        "name": "Current Capitalization (Millions of USD)",
+        "first-data-row": 1,
+    },
+    {
+        "name": "Valuation Multiples based on Current Capitalization",
+        "first-data-row": 1,
+    },
 )
 
 
@@ -17,10 +26,12 @@ class KeyStats(object):
         self._sheet = sheet
         self._raw_tables = util.get_tables(sheet, TABLES)
         self._tables = {}
-        for tname in TABLES:
+        for tmeta in TABLES:
+            tname = tmeta["name"]
             self._tables[tname] = util.TypeATable(self._raw_tables[tname])
 
     def dump(self):
-        for tname in TABLES:
+        for tmeta in TABLES:
+            tname = tmeta["name"]
             print("\n%s:\n" % (tname, ))
             self._tables[tname].dump()

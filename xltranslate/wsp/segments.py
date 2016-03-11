@@ -6,8 +6,14 @@ from . import util
 log = logging.getLogger(__name__)
 
 TABLES = (
-    "Business Segments",
-    "Geographic Segments",
+    {
+        "name": "Business Segments",
+        "first-data-row": 1,
+    },
+    {
+        "name": "Geographic Segments",
+        "first-data-row": 1,
+    },
 )
 
 
@@ -16,10 +22,12 @@ class Segments(object):
         self._sheet = sheet
         self._raw_tables = util.get_tables(sheet, TABLES)
         self._tables = {}
-        for tname in TABLES:
+        for tmeta in TABLES:
+            tname = tmeta["name"]
             self._tables[tname] = util.TypeATable(self._raw_tables[tname])
 
     def dump(self):
-        for tname in TABLES:
+        for tmeta in TABLES:
+            tname = tmeta["name"]
             print("\n%s:\n" % (tname, ))
             self._tables[tname].dump()

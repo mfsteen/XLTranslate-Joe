@@ -10,10 +10,11 @@ from . import wsp
 log = logging.getLogger(__name__)
 
 WSP_REGISTRY = {
-    'Income Statement': wsp.IncomeStatement,
     'Key Stats': wsp.KeyStats,
+    'Income Statement': wsp.IncomeStatement,
     'Balance Sheet': wsp.BalanceSheet,
     'Cash Flow': wsp.CashFlow,
+    "Multiples": wsp.Multiples,
     "Historical Capitalization": wsp.HistoricalCapitalization,
     "Ratios": wsp.Ratios,
     "Supplemental": wsp.Supplemental,

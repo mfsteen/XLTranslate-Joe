@@ -15,64 +15,70 @@ def sanitise_string(text):
     return text
 
 
-def get_tables(sheet, table_name_list):
+def get_tables(sheet, table_meta_list):
     row_gen = sheet.get_squared_range(1, 1, sheet.max_column, sheet.max_row)
     cells = [row for row in row_gen]
     tdata = {}
-    table_start_end_pairs = _split_table_start_end_pairs(table_name_list)
+    table_start_end_pairs = _split_table_start_end_pairs(table_meta_list)
     # extract tables
-    for tname, curr_next_pair in zip(table_name_list, table_start_end_pairs):
-        curr_tname, next_tname = curr_next_pair
-        assert tname == curr_tname, "Bad order or curr-next-pairs"
-        tdata[tname] = _get_table_data_cells(cells, curr_tname, next_tname)
+    for tmeta, curr_next_pair in zip(table_meta_list, table_start_end_pairs):
+        curr_tmeta, next_tmeta = curr_next_pair
+        assert tmeta["name"] == curr_tmeta["name"], \
+            "Bad order or curr-next-pairs"
+        tdata[tmeta["name"]] = _get_table_data_cells(
+            cells, curr_tmeta, next_tmeta)
     return tdata
 
 
-def _split_table_start_end_pairs(table_name_list):
+def _split_table_start_end_pairs(table_meta_list):
     pairs = []
     tno = 0
     while True:
-        tname = table_name_list[tno]
+        tmeta = table_meta_list[tno]
         next_tno = tno + 1
-        if next_tno == len(table_name_list):
-            pairs.append((tname, None))
+        if next_tno == len(table_meta_list):
+            pairs.append((tmeta, None))
             break
         else:
-            next_tname = table_name_list[next_tno]
-            pairs.append((tname, next_tname))
+            next_tmeta = table_meta_list[next_tno]
+            pairs.append((tmeta, next_tmeta))
         tno += 1
     return pairs
 
 
-def _get_table_data_cells(cells, curr_table_name, next_table_name):
+def _get_table_data_cells(cells, curr_tmeta, next_tmeta):
     start_found = False
     start = 0
     end_found = False
     end = 0
-    if next_table_name is None:
+    if next_tmeta is None:
         end_found = True
         end = len(cells) - 1
     for row, index in zip(cells, range(0, len(cells))):
         c1_value = sanitise_string(row[0].value)
-        if not start_found and c1_value == curr_table_name:
+        if not start_found and c1_value.startswith(curr_tmeta["name"]):
             start_found = True
             start = index + 1
-        if not end_found and c1_value == next_table_name:
+        if not end_found and c1_value.startswith(next_tmeta["name"]):
             end_found = True
             end = index
         if start_found and end_found:
             break
     if not start_found or not end_found:
         raise RuntimeError("Could not narrow-down table %s" %
-                           (curr_table_name, ))
+                           (curr_tmeta["name"], ))
+    log.debug("Located table %s between rows %d and %d",
+              curr_tmeta["name"], start, end)
     table = cells[start:end]
     empty = 0
-    for cell in reversed(table[0]):
+    for cell in reversed(table[curr_tmeta["first-data-row"] - 1]):
         if cell.value is None:
             empty += 1
         else:
             break
     ntable = []
+    log.debug("Trimming extracted table of empty values. Row-len=%d, empty=%d",
+              len(row), empty)
     for row in table:
         ntable.append(row[0:(len(row) - empty)])
     return ntable
