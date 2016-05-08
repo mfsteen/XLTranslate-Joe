@@ -74,10 +74,11 @@ class TypeBTable(object):
                 data = data.strftime("%b-%d-%Y")
             if data in ('-', ):
                 data = 0
+            data = str(data)
             data_set.append(data)
         return data_set
 
-    def dump(self):
+    def dump_to_screen(self):
         # construct a format-line for pretty printing
         fmt_list = []
         for col in range(0, len(self._variable_names)):
@@ -106,8 +107,14 @@ class Multiples(object):
             tname = tmeta["name"]
             self._tables[tname] = TypeBTable(self._raw_tables[tname])
 
-    def dump(self):
+    def dump_to_screen(self):
         for tmeta in TABLES:
             tname = tmeta["name"]
             print("\n%s:\n" % (tname, ))
-            self._tables[tname].dump()
+            self._tables[tname].dump_to_screen()
+
+    def dump_to_hdf5(self, h5_group):
+        for tmeta in TABLES:
+            tname = tmeta["name"]
+            table = self._tables[tname]
+            util.dump_to_hdf5(table.data_set, h5_group, tname)

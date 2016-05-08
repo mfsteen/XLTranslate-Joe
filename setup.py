@@ -36,5 +36,6 @@ setup(name='xltranslate',
       entry_points="""\
       [console_scripts]
       xltranslate = xltranslate.script:main
+      dump_hdf5 = xltranslate.dump_hdf5:main
       """,
 )

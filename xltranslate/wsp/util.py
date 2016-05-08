@@ -97,7 +97,7 @@ class TypeATable(object):
 
     @property
     def variables(self):
-        return self._variables
+        return self._variable_names
 
     @property
     def data_set(self):
@@ -127,10 +127,11 @@ class TypeATable(object):
                 data = data.strftime("%b-%d-%Y")
             if data in ('-', ):
                 data = 0
+            data = "%s" % (data, )
             data_set.append(data)
         return data_set
 
-    def dump(self):
+    def dump_to_screen(self):
         # construct a format-line for pretty printing
         fmt_list = []
         for col in range(0, len(self._variable_names)):
@@ -148,3 +149,27 @@ class TypeATable(object):
         for ds_line in self._data_set:
             fmtted = fmt_line.format(*ds_line)
             print(fmtted)
+
+
+def dump_to_hdf5(data_set, h5_group, dataset_name):
+    max_string_length = _compute_max_string_length(data_set)
+    dtype = "S%d" % (max_string_length + 1, )
+    col_size = len(data_set[0])
+    row_size = len(data_set)
+    dataset_name = dataset_name.replace('/', ' ')
+    h5dset = h5_group.create_dataset(dataset_name, (row_size, col_size),
+                                     dtype=dtype)
+    #log.debug("Value: %s", data_set)
+    for row in range(0, row_size):
+        h5dset[row] = data_set[row]
+
+
+def _compute_max_string_length(data_set):
+    col_count = len(data_set[0])
+    max_length = 0
+    for row in data_set:
+        for val in row:
+            val_len = len(val)
+            if val_len > max_length:
+                max_length = val_len
+    return max_length

@@ -74,6 +74,7 @@ def _extract_from_col(table, locations, start_col):
             data = data.strftime("%b-%d-%Y")
         if data in ('-', ):
             data = 0
+        data = str(data)
         drow.append(data)
     return drow
 
@@ -96,6 +97,10 @@ class Table(object):
     def __init__(self, variables, data_set):
         self._variables = variables
         self._data_set = data_set
+
+    @property
+    def data_set(self):
+        return self._data_set
 
     def dump(self):
         # construct a format-line for pretty printing
@@ -136,7 +141,13 @@ class CapitalStructureSummary(object):
                 log.error("Failed to extract table '%s'", tname)
             self._tables[tname] = table
 
-    def dump(self):
+    def dump_to_screen(self):
         for name, table in self._tables.iteritems():
             print("\n%s:\n" % (name, ))
-            table.dump()
+            table.dump_to_screen()
+
+    def dump_to_hdf5(self, h5_group):
+        for tmeta in TABLES:
+            tname = tmeta["name"]
+            table = self._tables[tname]
+            util.dump_to_hdf5(table.data_set, h5_group, tname)

@@ -22,8 +22,14 @@ class Ratios(object):
             tname = tmeta["name"]
             self._tables[tname] = util.TypeATable(self._raw_tables[tname])
 
-    def dump(self):
+    def dump_to_screen(self):
         for tmeta in TABLES:
             tname = tmeta["name"]
             print("\n%s:\n" % (tname, ))
-            self._tables[tname].dump()
+            self._tables[tname].dump_to_screen()
+
+    def dump_to_hdf5(self, h5_group):
+        for tmeta in TABLES:
+            tname = tmeta["name"]
+            table = self._tables[tname]
+            util.dump_to_hdf5(table.data_set, h5_group, tname)
