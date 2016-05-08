@@ -174,3 +174,40 @@ def _compute_max_string_length(data_set):
             if val_len > max_length:
                 max_length = val_len
     return max_length
+
+
+def get_sheet_metadata(sheet):
+    row_gen = sheet.get_squared_range(1, 1, sheet.max_column, sheet.max_row)
+    cells = [row for row in row_gen]
+    set1 = _extract_metadata(cells, 6, 1)
+    set2 = _extract_metadata(cells, 6, 4)
+    set1.update(set2)
+    return set1
+
+def _extract_metadata(cells, start_row, start_col):
+    """The start_row and start_col are indexed from 0 in the 2-D array,
+    cells
+
+    """
+
+    row_no = start_row
+    col_no = start_col
+    row_count = len(cells)
+    data = {}
+    while True:
+        k_cell = cells[row_no][col_no]
+        if k_cell.value is None:
+            return data
+        v_cell = cells[row_no][col_no + 1]
+        if v_cell.value is None:
+            return data
+        k = sanitise_string(k_cell.value)
+        v = sanitise_string(v_cell.value)
+        if k.endswith(":"):
+            k = k[:-1]
+        data[k] = v
+        row_no += 1
+        if row_no == row_count:
+            log.error("Metadata table cannot go all the way to the end"
+                      " of the sheet. Something wrong. Bailing.")
+            return {}

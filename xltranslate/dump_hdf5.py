@@ -25,9 +25,13 @@ def dump(file_name):
     h5 = h5py.File(file_name, 'r')
     for group_name in h5:
         group = h5[group_name]
+        print("Group: %s" % (group_name, ))
+        print("Metadata:")
+        for k, v in group.attrs.items():
+            print("  key= %s, value= %s" % (k, v))
         for dataset_name in group:
             dataset = group[dataset_name]
-            print("Group: %s, Dataset: %s" % (group_name, dataset_name))
+            print("Dataset: %s" % (dataset_name, ))
             print("Variables: %s" % (dataset.attrs['variables']))
             var_len = len((dataset.attrs['variables']))
             print("Number of variables: %s" % (var_len, ))
@@ -36,6 +40,7 @@ def dump(file_name):
             fmt_string = _get_fmt_string(dataset)
             for row in dataset:
                 print(fmt_string.format(*row))
+        print("*" * 100)
 
 
 def main():

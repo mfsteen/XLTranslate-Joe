@@ -16,6 +16,7 @@ TABLES = (
 class CashFlow(object):
     def __init__(self, sheet):
         self._sheet = sheet
+        self._metadata = util.get_sheet_metadata(sheet)
         self._raw_tables = util.get_tables(sheet, TABLES)
         self._tables = {}
         for tmeta in TABLES:
@@ -29,6 +30,10 @@ class CashFlow(object):
             self._tables[tname].dump_to_screen()
 
     def dump_to_hdf5(self, h5_group):
+        # Store sheet metadata as group attributes
+        for k, v in self._metadata.items():
+            h5_group.attrs[k] = v
+        # Store each table as dataset
         for tmeta in TABLES:
             tname = tmeta["name"]
             table = self._tables[tname]
