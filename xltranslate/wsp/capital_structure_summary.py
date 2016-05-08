@@ -99,6 +99,10 @@ class Table(object):
         self._data_set = data_set
 
     @property
+    def variables(self):
+        return self._variables
+
+    @property
     def data_set(self):
         return self._data_set
 
@@ -150,4 +154,4 @@ class CapitalStructureSummary(object):
         for tmeta in TABLES:
             tname = tmeta["name"]
             table = self._tables[tname]
-            util.dump_to_hdf5(table.data_set, h5_group, tname)
+            util.dump_to_hdf5(table.variables, table.data_set, h5_group, tname)

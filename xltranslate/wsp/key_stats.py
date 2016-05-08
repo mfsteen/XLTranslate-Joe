@@ -40,4 +40,4 @@ class KeyStats(object):
         for tmeta in TABLES:
             tname = tmeta["name"]
             table = self._tables[tname]
-            util.dump_to_hdf5(table.data_set, h5_group, tname)
+            util.dump_to_hdf5(table.variables, table.data_set, h5_group, tname)

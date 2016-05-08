@@ -151,7 +151,7 @@ class TypeATable(object):
             print(fmtted)
 
 
-def dump_to_hdf5(data_set, h5_group, dataset_name):
+def dump_to_hdf5(variables, data_set, h5_group, dataset_name):
     max_string_length = _compute_max_string_length(data_set)
     dtype = "S%d" % (max_string_length + 1, )
     col_size = len(data_set[0])
@@ -162,6 +162,7 @@ def dump_to_hdf5(data_set, h5_group, dataset_name):
     #log.debug("Value: %s", data_set)
     for row in range(0, row_size):
         h5dset[row] = data_set[row]
+    h5dset.attrs["variables"] = variables
 
 
 def _compute_max_string_length(data_set):

@@ -27,7 +27,12 @@ def dump(file_name):
         group = h5[group_name]
         for dataset_name in group:
             dataset = group[dataset_name]
-            log.debug("Group: %s, Dataset: %s", group_name, dataset_name)
+            print("Group: %s, Dataset: %s" % (group_name, dataset_name))
+            print("Variables: %s" % (dataset.attrs['variables']))
+            var_len = len((dataset.attrs['variables']))
+            print("Number of variables: %s" % (var_len, ))
+            row_len, col_len = dataset.shape
+            assert var_len == col_len, "Number of columns dont match"
             fmt_string = _get_fmt_string(dataset)
             for row in dataset:
                 print(fmt_string.format(*row))
