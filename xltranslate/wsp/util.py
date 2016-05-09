@@ -159,7 +159,7 @@ def create_type_a_table(raw_table):
     return TypeATable(raw_table)
 
 
-def dump_to_hdf5(variables, data_set, h5_group, dataset_name):
+def _dump_to_hdf5(variables, data_set, h5_group, dataset_name):
     max_string_length = _compute_max_string_length(data_set)
     dtype = "S%d" % (max_string_length + 1, )
     col_size = len(data_set[0])
@@ -171,6 +171,13 @@ def dump_to_hdf5(variables, data_set, h5_group, dataset_name):
     for row in range(0, row_size):
         h5dset[row] = data_set[row]
     h5dset.attrs["variables"] = variables
+
+
+def to_hdf5(group, wspobj):
+    for k, v in wspobj.metadata.items():
+        group.attrs[k] = v
+    for name, table in wspobj.tables.items():
+        _dump_to_hdf5(table.variables, table.data_set, group, name)
 
 
 def _compute_max_string_length(data_set):

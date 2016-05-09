@@ -24,21 +24,20 @@ class IndustrySpecific(object):
             table = util.create_type_a_table(self._raw_tables[tname])
             if table is None:
                 log.info("In sheet '%s', ignoring empty table: '%s'",
-                         "Industry Specific", tname)
+                         sheet.title, tname)
                 continue
             self._tables[tname] = table
+
+    @property
+    def tables(self):
+        return self._tables
+
+    @property
+    def metadata(self):
+        return self._metadata
 
     def dump_to_screen(self):
         for tmeta in TABLES:
             tname = tmeta["name"]
             print("\n%s:\n" % (tname, ))
             self._tables[tname].dump_to_screen()
-
-    def dump_to_hdf5(self, h5_group):
-        # Store sheet metadata as group attributes
-        for k, v in self._metadata.items():
-            h5_group.attrs[k] = v
-        # Store each table as dataset
-        for name, table in self._tables.items():
-            util.dump_to_hdf5(table.variables, table.data_set,
-                              h5_group, name)

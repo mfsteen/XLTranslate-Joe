@@ -143,20 +143,20 @@ class CapitalStructureSummary(object):
             tname = tmeta["name"]
             table = extract_type_c_table(raw_tables[tname])
             if table is None:
-                log.error("Failed to extract table '%s'", tname)
+                log.info("In sheet '%s', ignoring empty table: '%s'",
+                         sheet.title, tname)
+                continue
             self._tables[tname] = table
+
+    @property
+    def tables(self):
+        return self._tables
+
+    @property
+    def metadata(self):
+        return self._metadata
 
     def dump_to_screen(self):
         for name, table in self._tables.iteritems():
             print("\n%s:\n" % (name, ))
             table.dump_to_screen()
-
-    def dump_to_hdf5(self, h5_group):
-        # Store sheet metadata as group attributes
-        for k, v in self._metadata.items():
-            h5_group.attrs[k] = v
-        # Store each table as dataset
-        for tmeta in TABLES:
-            tname = tmeta["name"]
-            table = self._tables[tname]
-            util.dump_to_hdf5(table.variables, table.data_set, h5_group, tname)

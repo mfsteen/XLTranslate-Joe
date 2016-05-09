@@ -34,9 +34,9 @@ def extract(input_file, output_file_name):
         if klass is not None:
             wspobj = klass(sheet)
             group = h5.create_group(sheet.title)
-            wspobj.dump_to_hdf5(group)
+            wsp.to_hdf5(group, wspobj)
         else:
-            log.warn("Ignoring unknown sheet = %s" % (sheet.title, ))
+            log.info("Ignoring unknown sheet = %s" % (sheet.title, ))
 
 
 def main():
