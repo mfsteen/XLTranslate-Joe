@@ -151,6 +151,14 @@ class TypeATable(object):
             print(fmtted)
 
 
+def create_type_a_table(raw_table):
+    if len(raw_table) < 2:
+        return None
+    if len(raw_table[0]) < 2:
+        return None
+    return TypeATable(raw_table)
+
+
 def dump_to_hdf5(variables, data_set, h5_group, dataset_name):
     max_string_length = _compute_max_string_length(data_set)
     dtype = "S%d" % (max_string_length + 1, )
