@@ -16,6 +16,17 @@ def sanitise_string(text):
 
 
 def get_tables(sheet, table_meta_list):
+    """Slice out the cells for each table defined in table_meta_list
+
+    This function tries to locate all the tables defined in the
+    'table_meta_list'. If a table is not found, it is skipped. This
+    returns a dictionary containing the cells for each table, indexed
+    by the table name.
+
+    Note: Not all tables in the 'table_meta_list' will have data in
+    the returned dict.
+
+    """
     table_meta_dict = _to_table_meta_dict(table_meta_list)
     row_gen = sheet.get_squared_range(1, 1, sheet.max_column, sheet.max_row)
     cells = [row for row in row_gen]
@@ -42,6 +53,10 @@ def _to_table_meta_dict(table_meta_list):
 
 
 def _get_table_start_rows(cells, table_meta_list, sheet_title):
+    """Searches the sheet for the given tables and locates their starting
+    row numbers.
+
+    """
     start_rows = []
     for table_meta in table_meta_list:
         tname = table_meta["name"]
@@ -80,6 +95,8 @@ def _get_table_data_cells(cells, start_row, end_row, first_data_row_number):
 
 
 class _Table(object):
+    """A representation of the table in a sheet"""
+
     def __init__(self, table_data):
         self._table_data = table_data
         self._row_len = len(table_data)
@@ -155,6 +172,22 @@ def _create_table(raw_table):
 
 
 class ParsedSheet(object):
+    """A representation of a sheet containing tables
+
+    The ctor takes:
+
+    sheet: The sheet that should be parsed
+
+    table_meta_list: List of table descriptions
+
+    table_factory; A callable which will be used to create a
+    representative Table object. While for most parsers, the _Table in
+    the current file is sufficient, for some it is not. If this
+    callable returns a 'None', its assumed that a _Table object cannot
+    be constructed from the given data.
+
+    """
+
     def __init__(self, sheet, table_meta_list,
                  table_factory=_create_table):
         self._metadata = get_sheet_metadata(sheet)
