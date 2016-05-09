@@ -15,6 +15,10 @@ TABLES = (
         "first-data-row": 1,
     },
     {
+        "name": "Latest Capitalization (Millions of USD)",
+        "first-data-row": 1,
+    },
+    {
         "name": "Valuation Multiples based on Current Capitalization",
         "first-data-row": 1,
     },
@@ -27,9 +31,8 @@ class KeyStats(object):
         self._metadata = util.get_sheet_metadata(sheet)
         self._raw_tables = util.get_tables(sheet, TABLES)
         self._tables = {}
-        for tmeta in TABLES:
-            tname = tmeta["name"]
-            table = util.create_type_a_table(self._raw_tables[tname])
+        for tname, raw_table in self._raw_tables.items():
+            table = util.create_type_a_table(raw_table)
             if table is None:
                 log.info("In sheet '%s', ignoring empty table: '%s'",
                          sheet.title, tname)

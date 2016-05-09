@@ -16,71 +16,66 @@ def sanitise_string(text):
 
 
 def get_tables(sheet, table_meta_list):
+    table_meta_dict = _to_table_meta_dict(table_meta_list)
     row_gen = sheet.get_squared_range(1, 1, sheet.max_column, sheet.max_row)
     cells = [row for row in row_gen]
-    tdata = {}
-    table_start_end_pairs = _split_table_start_end_pairs(table_meta_list)
-    # extract tables
-    for tmeta, curr_next_pair in zip(table_meta_list, table_start_end_pairs):
-        curr_tmeta, next_tmeta = curr_next_pair
-        assert tmeta["name"] == curr_tmeta["name"], \
-            "Bad order or curr-next-pairs"
-        tdata[tmeta["name"]] = _get_table_data_cells(
-            cells, curr_tmeta, next_tmeta)
-    return tdata
+    table_start_rows = _get_table_start_rows(cells, table_meta_list)
+    tables = {}
+    for index in range(0, len(table_start_rows)):
+        tname, start_row = table_start_rows[index]
+        first_data_row_number = table_meta_dict[tname]["first-data-row"]
+        end_row = sheet.max_row
+        next_index = index + 1
+        if next_index < len(table_start_rows):
+            end_row = table_start_rows[next_index][1]
+        tables[tname] = _get_table_data_cells(cells, start_row, end_row,
+                                              first_data_row_number)
+    return tables
 
 
-def _split_table_start_end_pairs(table_meta_list):
-    pairs = []
-    tno = 0
-    while True:
-        tmeta = table_meta_list[tno]
-        next_tno = tno + 1
-        if next_tno == len(table_meta_list):
-            pairs.append((tmeta, None))
-            break
-        else:
-            next_tmeta = table_meta_list[next_tno]
-            pairs.append((tmeta, next_tmeta))
-        tno += 1
-    return pairs
+def _to_table_meta_dict(table_meta_list):
+    d = {}
+    for tmeta in table_meta_list:
+        d[tmeta["name"]] = tmeta
+    return d
 
 
-def _get_table_data_cells(cells, curr_tmeta, next_tmeta):
-    start_found = False
-    start = 0
-    end_found = False
-    end = 0
-    if next_tmeta is None:
-        end_found = True
-        end = len(cells) - 1
-    for row, index in zip(cells, range(0, len(cells))):
+def _get_table_start_rows(cells, table_meta_list):
+    start_rows = []
+    for table_meta in table_meta_list:
+        tname = table_meta["name"]
+        start_row = _get_starting_row(cells, tname)
+        if start_row is None:
+            log.info("Could not locate table '%s'. Ignoring.", tname)
+            continue
+        start_rows.append((tname, start_row))
+    sorted_start_rows = sorted(start_rows, key=lambda x: x[1])
+    return sorted_start_rows
+
+
+def _get_starting_row(cells, tname):
+    for row, row_number in zip(cells, range(0, len(cells))):
         c1_value = sanitise_string(row[0].value)
-        if not start_found and c1_value.startswith(curr_tmeta["name"]):
-            start_found = True
-            start = index + 1
-        if not end_found and c1_value.startswith(next_tmeta["name"]):
-            end_found = True
-            end = index
-        if start_found and end_found:
-            break
-    if not start_found or not end_found:
-        raise RuntimeError("Could not narrow-down table %s" %
-                           (curr_tmeta["name"], ))
-    log.debug("Located table %s between rows %d and %d",
-              curr_tmeta["name"], start, end)
-    table = cells[start:end]
+        if c1_value.startswith(tname):
+            return row_number
+    return None
+
+
+def _get_table_data_cells(cells, start_row, end_row, first_data_row_number):
+    table = cells[start_row:end_row]
     empty = 0
-    for cell in reversed(table[curr_tmeta["first-data-row"] - 1]):
+    first_data_row = table[first_data_row_number]
+    for cell in reversed(first_data_row):
         if cell.value is None:
             empty += 1
         else:
             break
+    last_index = len(first_data_row) - empty
     ntable = []
     log.debug("Trimming extracted table of empty values. Row-len=%d, empty=%d",
-              len(row), empty)
+              len(first_data_row), empty)
     for row in table:
-        ntable.append(row[0:(len(row) - empty)])
+        ntable.append(row[0:last_index])
     return ntable
 
 
@@ -167,7 +162,6 @@ def _dump_to_hdf5(variables, data_set, h5_group, dataset_name):
     dataset_name = dataset_name.replace('/', ' ')
     h5dset = h5_group.create_dataset(dataset_name, (row_size, col_size),
                                      dtype=dtype)
-    #log.debug("Value: %s", data_set)
     for row in range(0, row_size):
         h5dset[row] = data_set[row]
     h5dset.attrs["variables"] = variables
