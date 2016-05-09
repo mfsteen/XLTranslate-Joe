@@ -36,7 +36,7 @@ def extract(input_file, output_file_name):
             group = h5.create_group(sheet.title)
             wsp.to_hdf5(group, wspobj)
         else:
-            log.info("Ignoring unknown sheet = %s" % (sheet.title, ))
+            log.info("Ignoring unknown sheet '%s'." % (sheet.title, ))
 
 
 def main():

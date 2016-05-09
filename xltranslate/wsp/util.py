@@ -19,7 +19,8 @@ def get_tables(sheet, table_meta_list):
     table_meta_dict = _to_table_meta_dict(table_meta_list)
     row_gen = sheet.get_squared_range(1, 1, sheet.max_column, sheet.max_row)
     cells = [row for row in row_gen]
-    table_start_rows = _get_table_start_rows(cells, table_meta_list)
+    table_start_rows = _get_table_start_rows(cells, table_meta_list,
+                                             sheet.title)
     tables = {}
     for index in range(0, len(table_start_rows)):
         tname, start_row = table_start_rows[index]
@@ -40,13 +41,14 @@ def _to_table_meta_dict(table_meta_list):
     return d
 
 
-def _get_table_start_rows(cells, table_meta_list):
+def _get_table_start_rows(cells, table_meta_list, sheet_title):
     start_rows = []
     for table_meta in table_meta_list:
         tname = table_meta["name"]
         start_row = _get_starting_row(cells, tname)
         if start_row is None:
-            log.info("Could not locate table '%s'. Ignoring.", tname)
+            log.info("In sheet '%s', could not locate table '%s'. Ignoring.",
+                     sheet_title, tname)
             continue
         start_rows.append((tname, start_row))
     sorted_start_rows = sorted(start_rows, key=lambda x: x[1])
@@ -72,8 +74,6 @@ def _get_table_data_cells(cells, start_row, end_row, first_data_row_number):
             break
     last_index = len(first_data_row) - empty
     ntable = []
-    log.debug("Trimming extracted table of empty values. Row-len=%d, empty=%d",
-              len(first_data_row), empty)
     for row in table:
         ntable.append(row[0:last_index])
     return ntable
