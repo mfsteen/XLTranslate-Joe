@@ -1,9 +1,5 @@
 #
-import logging
-
 from . import util
-
-log = logging.getLogger(__name__)
 
 TABLES = (
     {
@@ -25,30 +21,5 @@ TABLES = (
 )
 
 
-class KeyStats(object):
-    def __init__(self, sheet):
-        self._sheet = sheet
-        self._metadata = util.get_sheet_metadata(sheet)
-        self._raw_tables = util.get_tables(sheet, TABLES)
-        self._tables = {}
-        for tname, raw_table in self._raw_tables.items():
-            table = util.create_type_a_table(raw_table)
-            if table is None:
-                log.info("In sheet '%s', ignoring empty table: '%s'",
-                         sheet.title, tname)
-                continue
-            self._tables[tname] = table
-
-    @property
-    def tables(self):
-        return self._tables
-
-    @property
-    def metadata(self):
-        return self._metadata
-
-    def dump_to_screen(self):
-        for tmeta in TABLES:
-            tname = tmeta["name"]
-            print("\n%s:\n" % (tname, ))
-            self._tables[tname].dump_to_screen()
+def factory(sheet):
+    return util.ParsedSheet(sheet, TABLES)

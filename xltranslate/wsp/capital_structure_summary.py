@@ -93,7 +93,7 @@ def _extract(table):
     return variables, data_set
 
 
-class Table(object):
+class _Table(object):
     def __init__(self, variables, data_set):
         self._variables = variables
         self._data_set = data_set
@@ -126,37 +126,13 @@ class Table(object):
             print(fmtted)
 
 
-def extract_type_c_table(table):
+def _create_table(table):
     variables, data_set = _extract(table)
     if variables is None:
         return None
-    table = Table(variables, data_set)
+    table = _Table(variables, data_set)
     return table
 
 
-class CapitalStructureSummary(object):
-    def __init__(self, sheet):
-        self._metadata = util.get_sheet_metadata(sheet)
-        raw_tables = util.get_tables(sheet, TABLES)
-        self._tables = {}
-        for tmeta in TABLES:
-            tname = tmeta["name"]
-            table = extract_type_c_table(raw_tables[tname])
-            if table is None:
-                log.info("In sheet '%s', ignoring empty table: '%s'",
-                         sheet.title, tname)
-                continue
-            self._tables[tname] = table
-
-    @property
-    def tables(self):
-        return self._tables
-
-    @property
-    def metadata(self):
-        return self._metadata
-
-    def dump_to_screen(self):
-        for name, table in self._tables.iteritems():
-            print("\n%s:\n" % (name, ))
-            table.dump_to_screen()
+def factory(sheet):
+    return util.ParsedSheet(sheet, TABLES, table_factory=_create_table)

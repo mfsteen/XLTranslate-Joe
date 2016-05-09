@@ -79,7 +79,7 @@ def _get_table_data_cells(cells, start_row, end_row, first_data_row_number):
     return ntable
 
 
-class TypeATable(object):
+class _Table(object):
     def __init__(self, table_data):
         self._table_data = table_data
         self._row_len = len(table_data)
@@ -146,12 +146,35 @@ class TypeATable(object):
             print(fmtted)
 
 
-def create_type_a_table(raw_table):
+def _create_table(raw_table):
     if len(raw_table) < 2:
         return None
     if len(raw_table[0]) < 2:
         return None
-    return TypeATable(raw_table)
+    return _Table(raw_table)
+
+
+class ParsedSheet(object):
+    def __init__(self, sheet, table_meta_list,
+                 table_factory=_create_table):
+        self._metadata = get_sheet_metadata(sheet)
+        raw_tables = get_tables(sheet, table_meta_list)
+        self._tables = {}
+        for tname, raw_table in raw_tables.items():
+            table = table_factory(raw_table)
+            if table is None:
+                log.info("In sheet '%s', ignoring empty table: '%s'",
+                         sheet.title, tname)
+                continue
+            self._tables[tname] = table
+
+    @property
+    def tables(self):
+        return self._tables
+
+    @property
+    def metadata(self):
+        return self._metadata
 
 
 def _dump_to_hdf5(variables, data_set, h5_group, dataset_name):
